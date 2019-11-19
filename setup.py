@@ -8,9 +8,10 @@ with open("README.md", "r") as fh:
 def main(version: str = "0.0.1"):
     setup(name='pyprofiling',
           version=version,
-          description='Profiling a program for visualization in chrome://tracing',
+          description='Profiling a program for visualization in chrome://tracing/',
           long_description=long_description,
-          url='https://github.com/JulianSobott/pynetworking',
+          long_description_content_type="text/markdown",
+          url='https://github.com/JulianSobott/pyprofiling',
           author='Julian Sobott',
           author_email='julian.sobott@gmail.com',
           license='Apache',
@@ -18,9 +19,8 @@ def main(version: str = "0.0.1"):
           include_package_data=True,
           keywords='profiling threads timing',
           project_urls={
-              "Bug Tracker": "https://github.com/JulianSobott/pynetworking/issues",
-              "Documentation": "http://pynetworking.readthedocs.io/",
-              "Source Code": "https://github.com/JulianSobott/pynetworking",
+              "Bug Tracker": "https://github.com/JulianSobott/pyprofiling/issues",
+              "Source Code": "https://github.com/JulianSobott/pyprofiling",
           },
           classifiers=[
               "Programming Language :: Python :: 3.7",
