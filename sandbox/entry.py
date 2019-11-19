@@ -1,9 +1,9 @@
 from pyprofiling.base import profile
-import sandbox
+import main
 
 
 def start_entry():
-    profile(sandbox.main.start_sandbox, globals(), "sandbox", "first_try")
+    profile(main.start_sandbox, globals())
 
 
 if __name__ == '__main__':

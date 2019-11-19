@@ -1,5 +1,6 @@
 import functools
 import threading
+import time
 
 
 def fun1(x):
@@ -49,6 +50,9 @@ class FirstClass:
         for i in range(1, 10000):
             x = i / i
             x += FirstClass.math.sqrt(i)
+        for i in range(3):
+            fun2()
+            time.sleep(0.001)
         return self
 
     @classmethod

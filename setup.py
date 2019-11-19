@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import unittest
 
-with open("README.rst", "r") as fh:
+with open("README.md", "r") as fh:
     long_description = fh.read()
 
 
