@@ -9,6 +9,10 @@ import threading
 
 PROFILING_ADDED = "__PROFILING_ADDED__"
 
+# TODO: Add docs to functions
+# TODO: Maybe make possible to use via console call: profile sandbox.py ...
+# TODO: Maybe add more options to ignore certain functions, pause profiler, auto save after X seconds, ...
+
 
 def gen_wrapper(func, is_descriptor=False, *args, **kwargs):
     """
@@ -19,6 +23,7 @@ def gen_wrapper(func, is_descriptor=False, *args, **kwargs):
     :param kwargs:
     :return:
     """
+    # TODO: Handle errors -> show stacktrace of original function call
     start = datetime.now().microsecond
     if is_descriptor:
         ret = func.__func__(*args, **kwargs)
