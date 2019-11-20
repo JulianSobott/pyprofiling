@@ -1,20 +1,21 @@
 from types import ModuleType
 from functools import wraps
 from datetime import datetime
-
-from pyprofiling.Logging import logger
-from pyprofiling.profiler import Profiler
 import threading
 
-
-PROFILING_ADDED = "__PROFILING_ADDED__"
+from .Logging import logger
+from .profiler import Profiler
+from .attributes import PROFILING_ADDED, STOP, SAVE, IGNORE
 
 # TODO: Add docs to functions
 # TODO: Maybe make possible to use via console call: profile sandbox.py ...
 # TODO: Maybe add more options to ignore certain functions, pause profiler, auto save after X seconds, ...
 
+ignores_in_thread = set()
+
 
 def gen_wrapper(func, is_descriptor=False, *args, **kwargs):
+    global ignores_in_thread
     """
 
     :param func: a function
@@ -23,7 +24,10 @@ def gen_wrapper(func, is_descriptor=False, *args, **kwargs):
     :param kwargs:
     :return:
     """
+    thread_name = threading.current_thread().name
     # TODO: Handle errors -> show stacktrace of original function call
+    if IGNORE in func.__dict__.keys():
+        ignores_in_thread.add(thread_name)
     start = datetime.now().microsecond
     if is_descriptor:
         ret = func.__func__(*args, **kwargs)
@@ -34,7 +38,11 @@ def gen_wrapper(func, is_descriptor=False, *args, **kwargs):
         name = func.__func__.__name__
     else:
         name = func.__name__
-    Profiler.write_method(name, start, end, threading.current_thread().name)
+    if thread_name not in ignores_in_thread:
+        Profiler.write_method(name, start, end, thread_name)
+    if IGNORE in func.__dict__.keys():
+        ignores_in_thread.remove(thread_name)
+        logger.debug("Ignored (exit): " + func.__name__)
     return ret
 
 

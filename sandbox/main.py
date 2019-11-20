@@ -1,12 +1,14 @@
 import functools
 import threading
 import time
+from pyprofiling import ignore
 
 
 def fun1(x):
     return 10 + x
 
 
+@ignore
 def fun2():
     for i in range(1, 100000):
         x = i / i
