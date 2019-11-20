@@ -2,9 +2,9 @@
 
 """
 from functools import wraps
-from attributes import IGNORE, SAVE, STOP
+from attributes import IGNORE, SAVE, STOP_AFTER, STOP_BEFORE
 
-__all__ = ["ignore", "stop", "save"]
+__all__ = ["ignore", "stop_after", "stop_before", "save"]
 
 
 def ignore(func):
@@ -16,13 +16,24 @@ def ignore(func):
     return wrapper
 
 
-def stop(func):
-    """Stops the program and saves the profile to the file when this function is called"""
-    func.__dict__[STOP] = True
+def stop_after(func):
+    """Stops the program and saves the profile to the file after this function finished executing"""
+    func.__dict__[STOP_AFTER] = True
 
     @wraps(func)
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)
+    return wrapper
+
+
+def stop_before(func):
+    """Stops the program and saves the profile to the file when this function is called"""
+    func.__dict__[STOP_BEFORE] = True
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+
     return wrapper
 
 

@@ -1,14 +1,14 @@
 import functools
 import threading
 import time
-from pyprofiling import ignore
+from pyprofiling import *
 
 
-def fun1(x):
-    return 10 + x
+@stop_after
+def fun1():
+    time.sleep(0.5)
 
 
-@ignore
 def fun2():
     for i in range(1, 100000):
         x = i / i
@@ -16,8 +16,6 @@ def fun2():
 
 
 def start_sandbox():
-    # x = 10
-    # fun1(x)
     # fun2(10, x=10)
     f = FirstClass()
     t1 = threading.Thread(target=f.do_something)
@@ -26,7 +24,7 @@ def start_sandbox():
     t2.start()
     t1.join()
     t2.join()
-    # f.stats2()
+    fun1()
     #FirstClass.stats()
 
 

@@ -4,8 +4,8 @@ from datetime import datetime
 import threading
 
 from .Logging import logger
-from .profiler import Profiler
-from .attributes import PROFILING_ADDED, STOP, SAVE, IGNORE
+from .profiler import Profiler, FunctionRunner
+from .attributes import PROFILING_ADDED, STOP_AFTER, STOP_BEFORE, SAVE, IGNORE
 
 # TODO: Add docs to functions
 # TODO: Maybe make possible to use via console call: profile sandbox.py ...
@@ -24,25 +24,27 @@ def gen_wrapper(func, is_descriptor=False, *args, **kwargs):
     :param kwargs:
     :return:
     """
+    # with FunctionRunner(func, is_descriptor) as f:
+    #     f.run(*args, **kwargs)
     thread_name = threading.current_thread().name
+    function_name = func.__func__.__name__ if is_descriptor else func.__name__
     # TODO: Handle errors -> show stacktrace of original function call
     if IGNORE in func.__dict__.keys():
         ignores_in_thread.add(thread_name)
+    if STOP_BEFORE in func.__dict__.keys():
+        exit(0)
     start = datetime.now().microsecond
     if is_descriptor:
         ret = func.__func__(*args, **kwargs)
     else:
         ret = func(*args, **kwargs)
     end = datetime.now().microsecond
-    if is_descriptor:
-        name = func.__func__.__name__
-    else:
-        name = func.__name__
     if thread_name not in ignores_in_thread:
-        Profiler.write_method(name, start, end, thread_name)
+        Profiler.write_method(function_name, start, end, thread_name)
     if IGNORE in func.__dict__.keys():
         ignores_in_thread.remove(thread_name)
-        logger.debug("Ignored (exit): " + func.__name__)
+    if STOP_AFTER in func.__dict__.keys():
+        exit(1)
     return ret
 
 
