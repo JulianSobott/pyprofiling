@@ -4,9 +4,8 @@ import time
 from pyprofiling import *
 
 
-@stop_before
 def fun1():
-    time.sleep(0.25)
+    time.sleep(1)
 
 
 def fun2():
@@ -15,8 +14,12 @@ def fun2():
         x += FirstClass.math.sqrt(i)
 
 
+@stop_in_seconds(1)
 def start_sandbox():
     # fun2(10, x=10)
+    fun1()
+    fun1()
+    fun1()
     f = FirstClass()
     t1 = threading.Thread(target=f.do_something)
     t2 = threading.Thread(target=fun2)

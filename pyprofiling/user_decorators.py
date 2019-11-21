@@ -2,9 +2,9 @@
 
 """
 from functools import wraps
-from attributes import IGNORE, SAVE, STOP_AFTER, STOP_BEFORE
+from attributes import IGNORE, SAVE, STOP_AFTER, STOP_BEFORE, STOP_IN_SECONDS
 
-__all__ = ["ignore", "stop_after", "stop_before", "save"]
+__all__ = ["ignore", "stop_after", "stop_before", "stop_in_seconds", "save"]
 
 
 def ignore(func):
@@ -45,3 +45,15 @@ def save(func):
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)
     return wrapper
+
+
+def stop_in_seconds(seconds):
+    def outer_wrapper(func):
+        func.__dict__[STOP_IN_SECONDS] = seconds
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+
+        return wrapper
+    return outer_wrapper

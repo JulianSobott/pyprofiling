@@ -3,7 +3,7 @@ from datetime import datetime
 import json
 import os
 
-from attributes import STOP_AFTER, STOP_BEFORE, SAVE, IGNORE
+from attributes import STOP_AFTER, STOP_BEFORE, STOP_IN_SECONDS, SAVE, IGNORE
 
 separator = ""
 
@@ -52,8 +52,6 @@ class Profiler:
 
 class FunctionRunner:
 
-    # TODO: Handle modifiers: ignore, stop, save, ...
-
     def __init__(self, func, is_descriptor):
         self.func = func
         self.is_descriptor = is_descriptor
@@ -70,12 +68,15 @@ class FunctionRunner:
         self.stop_before = self.is_in_dict(STOP_BEFORE)
         self.save = self.is_in_dict(SAVE)
         self.start_time = datetime.now().microsecond
+        if self.is_in_dict(STOP_IN_SECONDS):
+            self.handle_stop_in_seconds()
         if self.stop_before:
             exit(0)
         return self
 
     def run(self, *args, **kwargs):
-        return self.func(*args, **kwargs)
+        if not global_data.stop_executing_functions:
+            return self.func(*args, **kwargs)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.end_time = datetime.now().microsecond
@@ -100,15 +101,29 @@ class FunctionRunner:
             return True
         return False
 
+    def handle_stop_in_seconds(self):
+        import time
+        seconds = self.func.__dict__[STOP_IN_SECONDS]
+
+        def t():
+            time.sleep(seconds)
+            global_data.stop_executing()
+            exit(0)
+        threading.Thread(target=t).start()
+
 
 class GlobalData:
 
     def __init__(self):
         self.ignores_in_thread = set()
         self.profile_is_on = True
+        self.stop_executing_functions = False
 
     def stop_profile(self):
         self.profile_is_on = False
+
+    def stop_executing(self):
+        self.stop_executing_functions = True
 
 
 global_data = GlobalData()
