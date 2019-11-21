@@ -4,9 +4,9 @@ import time
 from pyprofiling import *
 
 
-@stop_after
+@stop_before
 def fun1():
-    time.sleep(0.5)
+    time.sleep(0.25)
 
 
 def fun2():
@@ -25,6 +25,7 @@ def start_sandbox():
     t1.join()
     t2.join()
     fun1()
+    fun2()
     #FirstClass.stats()
 
 
