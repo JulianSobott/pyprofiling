@@ -20,9 +20,10 @@ class Profiler:
         Profiler.instance = self
 
     def __enter__(self):
-        project_dir = os.path.dirname(os.path.abspath(__file__))
-        # TODO: set proper file path: Maybe create new folder in users project and save all files in it
-        self.file_path = os.path.join(project_dir, self.program_name + "_" + self.profile_name + ".json")
+        project_dir = os.getcwd()
+        profile_folder = os.path.join(project_dir, "profiles")
+        os.makedirs(profile_folder)
+        self.file_path = os.path.join(profile_folder, self.program_name + "_" + self.profile_name + ".json")
         self.file = open(self.file_path, "w")
         self.file.write('{"otherData": {"version": "'+self.program_name + self.profile_name+'"}, "traceEvents":[')
 
