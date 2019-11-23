@@ -73,19 +73,21 @@ class FunctionRunner:
         if self.is_in_dict(STOP_IN_SECONDS):
             self.handle_stop_in_seconds()
         if self.stop_before:
-            exit(0)
+            stop_application()
         return self
 
     def run(self, *args, **kwargs):
         if not global_data.stop_executing_functions:
             return self.func(*args, **kwargs)
+        else:
+            self.ignore = True
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.end_time_ns = time.time_ns()
         if not self.ignore and global_data.profile_is_on:
             Profiler.write_method(self.function_name, self.start_time_ns/1000, self.end_time_ns/1000, self.thread_name)
         if self.stop_after:
-            exit(0)
+            stop_application()
 
         if self.save:
             Profiler.save()
@@ -110,7 +112,7 @@ class FunctionRunner:
         def t():
             time.sleep(seconds)
             global_data.stop_executing()
-            exit(0)
+            stop_application()
         threading.Thread(target=t).start()
 
 
@@ -129,3 +131,11 @@ class GlobalData:
 
 
 global_data = GlobalData()
+
+
+def stop_application():
+    for thread in threading.enumerate():
+        try:
+            thread.stop()
+        except Exception as e:
+            logger.debug(e)

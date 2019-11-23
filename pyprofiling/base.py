@@ -1,6 +1,7 @@
 from types import ModuleType
 from functools import wraps
 from datetime import datetime
+import threading_mock
 import threading
 
 from .Logging import logger
@@ -109,8 +110,21 @@ def add_class(class_name, class_item, program_name):
 
 def profile(func: callable, globals_dict: dict, program_name: str = "", profile_name: str = "profiling_results", *args,
             **kwargs):
-    with Profiler(program_name, profile_name):
-        if not program_name:
-            program_name = func.__module__.split(".")[0]
-        add_decorators(globals_dict, program_name)
-        profile_function(func)(*args, **kwargs)
+    """
+    profiles a program.
+
+    A new thread needs to be started to ensure that the program can be stopped.
+
+    Parameters
+    ----------
+    """
+    def thread(func: callable, globals_dict: dict, program_name: str = "", profile_name: str = "profiling_results",
+               *args, **kwargs):
+        with Profiler(program_name, profile_name):
+            if not program_name:
+                program_name = func.__module__.split(".")[0]
+            add_decorators(globals_dict, program_name)
+            profile_function(func)(*args, **kwargs)
+    t = threading.Thread(target=thread, args=(func, globals_dict, program_name, profile_name, *args, *kwargs))
+    t.start()
+    t.join()
