@@ -1,8 +1,9 @@
 import threading
-from datetime import datetime
+import time
 import json
 import os
 
+from Logging import logger
 from attributes import STOP_AFTER, STOP_BEFORE, STOP_IN_SECONDS, SAVE, IGNORE
 
 separator = ""
@@ -23,7 +24,7 @@ class Profiler:
         # TODO: set proper file path: Maybe create new folder in users project and save all files in it
         self.file_path = os.path.join(project_dir, self.program_name + "_" + self.profile_name + ".json")
         self.file = open(self.file_path, "w")
-        self.file.write('{"otherData": {}, "traceEvents":[')
+        self.file.write('{"otherData": {"version": "'+self.program_name + self.profile_name+'"}, "traceEvents":[')
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.save()
@@ -31,7 +32,7 @@ class Profiler:
     @staticmethod
     def save():
         if not Profiler.instance._saved:
-            Profiler.instance.file.write("]}")
+            Profiler.instance.file.write(']}')
             print("Successfully saved profile in: " + Profiler.instance.file_path)
             Profiler.instance.file.close()
             Profiler.instance._saved = True
@@ -39,8 +40,9 @@ class Profiler:
     @staticmethod
     def write_method(name, start_time, end_time, thread_id):
         global separator
+        dur_microseconds = (end_time - start_time)
         data = {"cat": "function",
-                "dur": end_time - start_time,
+                "dur": dur_microseconds,
                 "name": name,
                 "ph": "X",
                 "pid": "0",
@@ -67,7 +69,7 @@ class FunctionRunner:
         self.stop_after = self.is_in_dict(STOP_AFTER)
         self.stop_before = self.is_in_dict(STOP_BEFORE)
         self.save = self.is_in_dict(SAVE)
-        self.start_time = datetime.now().microsecond
+        self.start_time_ns = time.time_ns()
         if self.is_in_dict(STOP_IN_SECONDS):
             self.handle_stop_in_seconds()
         if self.stop_before:
@@ -79,9 +81,9 @@ class FunctionRunner:
             return self.func(*args, **kwargs)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.end_time = datetime.now().microsecond
+        self.end_time_ns = time.time_ns()
         if not self.ignore and global_data.profile_is_on:
-            Profiler.write_method(self.function_name, self.start_time, self.end_time, self.thread_name)
+            Profiler.write_method(self.function_name, self.start_time_ns/1000, self.end_time_ns/1000, self.thread_name)
         if self.stop_after:
             exit(0)
 
