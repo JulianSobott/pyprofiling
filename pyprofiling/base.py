@@ -125,6 +125,7 @@ def profile(func: callable, globals_dict: dict, program_name: str = "", profile_
                 program_name = func.__module__.split(".")[0]
             add_decorators(globals_dict, program_name)
             profile_function(func)(*args, **kwargs)
-    t = threading.Thread(target=thread, args=(func, globals_dict, program_name, profile_name, *args, *kwargs))
+    t = threading.Thread(target=thread, name="MainThread",
+                         args=(func, globals_dict, program_name, profile_name, *args, *kwargs))
     t.start()
     t.join()

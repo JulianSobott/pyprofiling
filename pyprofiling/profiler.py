@@ -55,7 +55,7 @@ class Profiler:
 class FunctionRunner:
 
     def __init__(self, func, is_descriptor):
-        self.func = func
+        self.func = func.__func__ if is_descriptor else func
         self.is_descriptor = is_descriptor
         self.function_name = func.__func__.__name__ if is_descriptor else func.__name__
         self.thread_name = threading.current_thread().name
@@ -138,4 +138,4 @@ def stop_application():
         try:
             thread.stop()
         except Exception as e:
-            logger.debug(e)
+            logger.debug(str(e) + "  " + thread.name)

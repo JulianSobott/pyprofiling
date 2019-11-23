@@ -14,22 +14,24 @@ def fun2():
         x += FirstClass.math.sqrt(i)
 
 
-@stop_in_seconds(1)
+def fun3(s):
+    time.sleep(s)
+
+
 def start_sandbox():
     # fun2(10, x=10)
     fun1()
-    fun1()
-    fun1()
+    fun3(1)
     f = FirstClass()
-    t1 = threading.Thread(target=f.do_something)
-    t2 = threading.Thread(target=fun2)
+    t1 = threading.Thread(target=f.do_something, name="Thread1InMain")
+    t2 = threading.Thread(target=fun2, name="Thread2InMain")
     t1.start()
     t2.start()
     t1.join()
     t2.join()
     fun1()
     fun2()
-    #FirstClass.stats()
+    FirstClass.stats()
 
 
 def dec(f):
